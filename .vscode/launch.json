@@ -8,6 +8,13 @@
             "type": "java",
             "name": "Solution",
             "request": "launch",
+            "mainClass": "assignment3.interfaces.task18.Solution",
+            "projectName": "OOP-AstanaIt-Sugirov-Maksat_7b00362"
+        },
+        {
+            "type": "java",
+            "name": "Solution",
+            "request": "launch",
             "mainClass": "assignment3.interfaces.task13.Solution",
             "projectName": "OOP-AstanaIt-Sugirov-Maksat_eb6e1f42"
         },
