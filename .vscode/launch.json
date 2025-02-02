@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Solution",
+            "request": "launch",
+            "mainClass": "assignment3.interfaces.task5.Solution",
+            "projectName": "OOP-AstanaIt-Sugirov-Maksat_7b00362"
+        },
+        {
+            "type": "java",
             "name": "Skyscraper",
             "request": "launch",
             "mainClass": "assignment3.ooppart2.task2.Skyscraper",

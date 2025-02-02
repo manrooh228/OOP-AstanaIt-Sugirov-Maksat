@@ -4,3 +4,4 @@ public interface CanFlyInterface {
         void fly();
         void notfly();
 }
+
