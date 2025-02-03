@@ -27,7 +27,7 @@ public class AssignmentPostmaloneApp {
                     String departmentName = scanner.nextLine();
                     Department department = new Department(departmentName, company);
                     company.addDepartment(department);
-                    System.out.println("Department added successfully!");
+                    System.out.println("Department added successfully");
                     break;
                 
                 case 2:
@@ -46,9 +46,9 @@ public class AssignmentPostmaloneApp {
 
                         Employee employee = new Employee(fullName, position, salary);
                         existingDepartment.addEmployee(employee);
-                        System.out.println("Employee added successfully!");
+                        System.out.println("Employee added successfully");
                     } else {
-                        System.out.println("Department not found!");
+                        System.out.println("Department not found");
                     }
                     break;
                 
@@ -64,11 +64,11 @@ public class AssignmentPostmaloneApp {
                     break;
                 
                 case 4:
-                    System.out.print("Enter the full name of the employee to search: ");
+                    System.out.print("Search by name: ");
                     String searchName = scanner.nextLine();
                     Employee foundEmployee = company.findEmployeeByFullName(searchName);
                     if (foundEmployee != null) {
-                        System.out.println("\nFound employee: " + foundEmployee.getFullName() + ", " + foundEmployee.getPosition() + ", Salary: " + foundEmployee.getSalary());
+                        System.out.println("\nEmployee: " + foundEmployee.getFullName() + ", " + foundEmployee.getPosition() + ", Salary: " + foundEmployee.getSalary());
                         System.out.println("Works in department: " + foundEmployee.getDepartment().getName());
                     } else {
                         System.out.println("\nEmployee with name " + searchName + " not found.");
@@ -76,7 +76,7 @@ public class AssignmentPostmaloneApp {
                     break;
                 
                 case 5:
-                    System.out.println("Exiting...");
+                    System.out.println("Ciao");
                     scanner.close();
                     return;
                 
