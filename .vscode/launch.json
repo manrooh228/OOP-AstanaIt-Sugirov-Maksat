@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "MainApp",
+            "request": "launch",
+            "mainClass": "endtermAssignment.MainApp",
+            "projectName": "OOP-AstanaIt-Sugirov-Maksat_eb6e1f42"
+        },
+        {
+            "type": "java",
             "name": "Solution",
             "request": "launch",
             "mainClass": "assignment3.interfaces.task5.Solution",
