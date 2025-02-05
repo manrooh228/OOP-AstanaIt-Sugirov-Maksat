@@ -9,9 +9,12 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 import endtermAssignment.domain.Company;
+import endtermAssignment.domain.Department;
 
 public class MainApp extends JFrame {
     private String currentMenu = "C";
+    private Company selectedCompany = null;
+    private Department selectedDepartment = null;
     private final Dimension buttonSize = new Dimension(Integer.MAX_VALUE, 35);
     private final Color mainColor = new Color(29, 88, 122);
     private JPanel mainPanel = new JPanel();
@@ -22,7 +25,7 @@ public class MainApp extends JFrame {
 
     public void initialize() {
 
-        setTitle("EndTerm OOP");
+        setTitle("Company-Department manager");
         
 
 
@@ -73,12 +76,25 @@ public class MainApp extends JFrame {
         // --------------Main panel---------------//
 
         ArrayList<Company> companies = new ArrayList<>();
-        companies.add(new Company("Nigger Co."));
-        companies.add(new Company("Niggars Co."));
-        companies.add(new Company("Niggars Co."));
+        ArrayList<Department> departments = new ArrayList<>();
+
+        Company company1 = new Company("Company A");
+        Department dep1 = new Department("Dept1", company1);
+        Department dep2 = new Department("Dept2", company1);
+        company1.addDepartment(dep1);
+        company1.addDepartment(dep2);
+        departments.add(dep1);
+        departments.add(dep2);
+        companies.add(company1);
+
+        Company company2 = new Company("Company B");
+        Department dep3 = new Department("Dept3", company2);
+        company2.addDepartment(dep3);
+        departments.add(dep3);
+        companies.add(company2);
         
         mainPanel.setPreferredSize(new Dimension(400, 350));
-        mainPanel.setBackground(Color.CYAN);
+        mainPanel.setBackground(Color.white);
         // mainPanel.setBorder(new EmptyBorder(20, 10, 20, 0));
 
         if(currentMenu.equals("C")) {
@@ -96,23 +112,22 @@ public class MainApp extends JFrame {
         // --------------Обработка нажатия кнопок---------------//
 
 
-        btnCompany.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (!currentMenu.equals("C")) {
-                    currentMenu = "C";
-                    initialize();
-                    loadCompanies(companies);
-                }
+        btnCompany.addActionListener(e -> {
+            if (!currentMenu.equals("C")) {
+                currentMenu = "C";
+                selectedCompany = null;
+                loadCompanies(companies);
             }
         });
 
-        btnDepartment.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (!currentMenu.equals("D")) {
+        btnDepartment.addActionListener(e -> {
+            if (!currentMenu.equals("D")) {
+                if (selectedCompany == null) {
                     currentMenu = "D";
-                    initialize();
+                    loadDepartments(departments);
+                } else {
+                    currentMenu = "D";
+                    loadDepartments(selectedCompany);
                 }
             }
         });
@@ -132,7 +147,6 @@ public class MainApp extends JFrame {
         // mainPanel.setLayout(new FlowLayout());
         add(mainPanel, BorderLayout.EAST);
         add(sidePanel, BorderLayout.CENTER);
-        setTitle("Company");
         setPreferredSize(new Dimension(600, 350));
         setMinimumSize(new Dimension(400, 225));
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -141,15 +155,75 @@ public class MainApp extends JFrame {
         setVisible(true);
     }
     
+    
     private void loadCompanies(ArrayList<Company> companies) {
         mainPanel.removeAll();
         for (Company company : companies) {
+            JButton companyButton = new JButton(company.getName());
+            companyButton.addActionListener(e -> {
+                selectedCompany = company;
+                currentMenu = "D";
+                loadDepartments(selectedCompany);
+            });
+            companyButton.setBackground(Color.WHITE);
+            companyButton.setForeground(mainColor);
+            companyButton.setPreferredSize(new Dimension(100, 80));
+            mainPanel.add(companyButton);
+        }
+        JButton addCompanyButton = new JButton("+");
+        addCompanyButton.addActionListener(e -> {
+            String newCompName = JOptionPane.showInputDialog("Введите название компании:");
+                if (newCompName != null && !newCompName.trim().isEmpty()) {
+                    companies.add(new Company(newCompName));
+                    loadCompanies(companies);
+                }
+        });
+        addCompanyButton.setBackground(Color.WHITE);
+        addCompanyButton.setForeground(mainColor);
+        addCompanyButton.setPreferredSize(new Dimension(100, 80));
+        mainPanel.add(addCompanyButton);
+        mainPanel.revalidate();
+        mainPanel.repaint();
+
+    }
+    
+    private void loadDepartments(ArrayList<Department> departments) {
+        mainPanel.removeAll();
+        for (Department department : departments) {
             JPanel card = new JPanel();
             card.setPreferredSize(new Dimension(100, 100));
             card.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-            card.add(new JLabel(company.getName()));
+            card.add(new JLabel(department.getName()));
             mainPanel.add(card);
         }
+        mainPanel.revalidate();
+        mainPanel.repaint();
+    }
+
+    private void loadDepartments(Company company) {
+        mainPanel.removeAll();
+        if (company != null) {
+            for (Department department : company.getDepartments()) {
+                JPanel card = new JPanel();
+                card.setPreferredSize(new Dimension(100, 100));
+                card.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+                card.add(new JLabel(department.getName()));
+                mainPanel.add(card);
+            }
+        } 
+
+        JButton addDepartmentButton = new JButton("+");
+        addDepartmentButton.addActionListener(e -> {
+            if (company != null) {
+                String newDeptName = JOptionPane.showInputDialog("Введите название отдела:");
+                if (newDeptName != null && !newDeptName.trim().isEmpty()) {
+                    company.addDepartment(new Department(newDeptName, company));
+                    loadDepartments(company);
+                }
+            }
+        });
+        mainPanel.add(addDepartmentButton);
+        
         mainPanel.revalidate();
         mainPanel.repaint();
     }
