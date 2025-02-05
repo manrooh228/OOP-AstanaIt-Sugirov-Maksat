@@ -3,5 +3,3 @@
       "lib/postgresql-42.6.0.jar"
     ]
   }
-  //mainPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 25, 15));
-  //

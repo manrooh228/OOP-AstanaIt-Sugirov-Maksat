@@ -9,6 +9,13 @@
             "name": "MainApp",
             "request": "launch",
             "mainClass": "endtermAssignment.MainApp",
+            "projectName": "OOP-AstanaIt-Sugirov-Maksat_7b00362"
+        },
+        {
+            "type": "java",
+            "name": "MainApp",
+            "request": "launch",
+            "mainClass": "endtermAssignment.MainApp",
             "projectName": "OOP-AstanaIt-Sugirov-Maksat_eb6e1f42"
         },
         {
