@@ -15,7 +15,7 @@ public class MainApp extends JFrame {
     private final Dimension buttonSize = new Dimension(Integer.MAX_VALUE, 35);
     private final Color mainColor = new Color(29, 88, 122);
     private JPanel mainPanel = new JPanel();
-
+    
     public MainApp() {
             initialize();
     }
@@ -78,9 +78,10 @@ public class MainApp extends JFrame {
         companies.add(new Company("Niggars Co."));
         
         mainPanel.setPreferredSize(new Dimension(400, 350));
-        mainPanel.setBackground(Color.CYAN);
-        // mainPanel.setBorder(new EmptyBorder(20, 10, 20, 0));
-
+        mainPanel.setBackground(Color.white);
+        // mainPanel.setBorder(new EmptyBorder(50, 20, 0, 20));
+        mainPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 25, 15));
+        
         if(currentMenu.equals("C")) {
             loadCompanies(companies);
         }
@@ -100,6 +101,7 @@ public class MainApp extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (!currentMenu.equals("C")) {
+                    mainPanel.removeAll();
                     currentMenu = "C";
                     initialize();
                     loadCompanies(companies);
@@ -111,6 +113,7 @@ public class MainApp extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (!currentMenu.equals("D")) {
+                    mainPanel.removeAll();
                     currentMenu = "D";
                     initialize();
                 }
@@ -121,6 +124,7 @@ public class MainApp extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (!currentMenu.equals("E")) {
+                    mainPanel.removeAll();
                     currentMenu = "E";
                     initialize();
                 }
@@ -146,7 +150,7 @@ public class MainApp extends JFrame {
         for (Company company : companies) {
             JPanel card = new JPanel();
             card.setPreferredSize(new Dimension(100, 100));
-            card.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+            card.setBorder(BorderFactory.createLineBorder(mainColor, 5));
             card.add(new JLabel(company.getName()));
             mainPanel.add(card);
         }
