@@ -3,11 +3,14 @@ package endtermAssignment;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
+import endtermAssignment.domain.Employee;
 import endtermAssignment.domain.Company;
 import endtermAssignment.domain.Department;
 
@@ -18,6 +21,9 @@ public class MainApp extends JFrame {
     private final Dimension buttonSize = new Dimension(Integer.MAX_VALUE, 35);
     private final Color mainColor = new Color(29, 88, 122);
     private JPanel mainPanel = new JPanel();
+    private ArrayList<Company> companies = new ArrayList<>();
+    private ArrayList<Department> departments = new ArrayList<>();
+    private ArrayList<Employee> employees = new ArrayList<>();
     
     public MainApp() {
             initialize();
@@ -75,9 +81,6 @@ public class MainApp extends JFrame {
 
         // --------------Main panel---------------//
 
-        ArrayList<Company> companies = new ArrayList<>();
-        ArrayList<Department> departments = new ArrayList<>();
-
         Company company1 = new Company("Company A");
         Department dep1 = new Department("Dept1", company1);
         Department dep2 = new Department("Dept2", company1);
@@ -86,7 +89,7 @@ public class MainApp extends JFrame {
         departments.add(dep1);
         departments.add(dep2);
         companies.add(company1);
-
+    
         Company company2 = new Company("Company B");
         Department dep3 = new Department("Dept3", company2);
         company2.addDepartment(dep3);
@@ -137,9 +140,13 @@ public class MainApp extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (!currentMenu.equals("E")) {
-                    mainPanel.removeAll();
-                    currentMenu = "E";
-                    initialize();
+                    if (selectedDepartment == null) {
+                        currentMenu = "E";
+                        loadEmployees(employees);
+                    } else {
+                        currentMenu = "E";
+                        loadEmployees(selectedDepartment);
+                    }
                 }
             }
         });
@@ -157,6 +164,14 @@ public class MainApp extends JFrame {
         setVisible(true);
     }
     
+
+
+
+
+
+    
+    //-----------------------------Functions------------------------------//
+    //-------------Companies functions--------------//
     
     private void loadCompanies(ArrayList<Company> companies) {
         mainPanel.removeAll();
@@ -188,7 +203,9 @@ public class MainApp extends JFrame {
         mainPanel.repaint();
 
     }
-    
+
+    //-------------Departments functions--------------//
+
     private void loadDepartments(ArrayList<Department> departments) {
         mainPanel.removeAll();
         for (Department department : departments) {
@@ -196,6 +213,12 @@ public class MainApp extends JFrame {
             card.setPreferredSize(new Dimension(100, 100));
             card.setBorder(BorderFactory.createLineBorder(Color.BLACK));
             card.add(new JLabel(department.getName()));
+            card.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    loadEmployees(department);
+                }
+            });
             mainPanel.add(card);
         }
         mainPanel.revalidate();
@@ -210,6 +233,12 @@ public class MainApp extends JFrame {
                 card.setPreferredSize(new Dimension(100, 100));
                 card.setBorder(BorderFactory.createLineBorder(Color.BLACK));
                 card.add(new JLabel(department.getName()));
+                card.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        loadEmployees(department);
+                    }
+                });
                 mainPanel.add(card);
             }
         } 
@@ -220,6 +249,7 @@ public class MainApp extends JFrame {
                 String newDeptName = JOptionPane.showInputDialog("Введите название отдела:");
                 if (newDeptName != null && !newDeptName.trim().isEmpty()) {
                     company.addDepartment(new Department(newDeptName, company));
+                    departments.add(new Department(newDeptName, company));
                     loadDepartments(company);
                 }
             }
@@ -228,6 +258,75 @@ public class MainApp extends JFrame {
         
         mainPanel.revalidate();
         mainPanel.repaint();
+    }
+    
+    //-------------Employees functions--------------//
+
+    private void loadEmployees (ArrayList<Employee> employees) {
+        mainPanel.removeAll();
+        for (Employee employee : employees) {
+            JPanel card = new JPanel();
+            card.setPreferredSize(new Dimension(100, 100));
+            card.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+            card.add(new JLabel(employee.getFullName()));
+            showEmpInfo(card, employee);
+        mainPanel.add(card);
+        mainPanel.revalidate();
+        mainPanel.repaint();
+        }
+    }
+
+    private void showEmpInfo(JPanel card, Employee employee) {
+        card.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                JOptionPane.showMessageDialog(null, 
+                "Имя: " + employee.getFullName() + 
+                "\nДолжность: " + employee.getPosition() + 
+                "\nЗарплата: " + employee.getSalary());
+            }
+        });
+    }
+
+
+    private void loadEmployees(Department department) {
+        mainPanel.removeAll();
+        if(department != null) {
+            for (Employee employee : department.getEmployees()) {
+                JPanel card = new JPanel();
+                card.setPreferredSize(new Dimension(100, 100));
+                card.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+                card.add(new JLabel(employee.getFullName()));
+                showEmpInfo(card, employee);
+                mainPanel.add(card);
+            }
+        }
+
+        JButton addDepartmentButton = new JButton("+");
+        addDepartmentButton.addActionListener(e -> addEmpDepartment(department));
+        mainPanel.add(addDepartmentButton);
+        mainPanel.revalidate();
+        mainPanel.repaint();
+    }
+        
+    private void addEmpDepartment(Department department) {
+        if (department != null) {
+            String newEmpName = JOptionPane.showInputDialog("Введите имя сотрудника:");
+            String newEmpPosition = JOptionPane.showInputDialog("Введите его должность:");
+            String newEmpSalary = JOptionPane.showInputDialog("Введите его зарплату:");
+            try {
+                Integer salary = Integer.parseInt(newEmpSalary);
+            
+                if (newEmpName != null && !newEmpName.trim().isEmpty() ||
+                    newEmpPosition != null && newEmpPosition.trim().isEmpty()) {
+                    department.addEmployee(new Employee(newEmpName, newEmpPosition, salary));
+                    employees.add(new Employee(newEmpName, newEmpPosition, salary));
+                    loadEmployees(department);
+                }
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(null, "Введите корректную зарплату!", "Ошибка", JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }
 
     public static void main(String[] args) {
