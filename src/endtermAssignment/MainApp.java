@@ -283,7 +283,10 @@ public class MainApp extends JFrame {
                 JOptionPane.showMessageDialog(null, 
                 "Имя: " + employee.getFullName() + 
                 "\nДолжность: " + employee.getPosition() + 
-                "\nЗарплата: " + employee.getSalary());
+                "\nЗарплата: " + employee.getSalary() +
+                "\nDepartment: " + employee.getDepartment().getName() + 
+                "\nCompany: " + employee.getDepartment().getCompany().getName());
+
             }
         });
     }
