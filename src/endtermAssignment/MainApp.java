@@ -11,6 +11,9 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 import endtermAssignment.domain.Employee;
+import endtermAssignment.repo.CompanyRepository;
+import endtermAssignment.repo.DepartmentRepository;
+import endtermAssignment.repo.EmployeesRepository;
 import endtermAssignment.domain.Company;
 import endtermAssignment.domain.Department;
 
@@ -81,20 +84,20 @@ public class MainApp extends JFrame {
 
         // --------------Main panel---------------//
 
-        Company company1 = new Company("Company A");
-        Department dep1 = new Department("Dept1", company1);
-        Department dep2 = new Department("Dept2", company1);
-        company1.addDepartment(dep1);
-        company1.addDepartment(dep2);
-        departments.add(dep1);
-        departments.add(dep2);
-        companies.add(company1);
+        // Company company1 = new Company("Company A");
+        // Department dep1 = new Department("Dept1", company1);
+        // Department dep2 = new Department("Dept2", company1);
+        // company1.addDepartment(dep1);
+        // company1.addDepartment(dep2);
+        // departments.add(dep1);
+        // departments.add(dep2);
+        // companies.add(company1);
     
-        Company company2 = new Company("Company B");
-        Department dep3 = new Department("Dept3", company2);
-        company2.addDepartment(dep3);
-        departments.add(dep3);
-        companies.add(company2);
+        // Company company2 = new Company("Company B");
+        // Department dep3 = new Department("Dept3", company2);
+        // company2.addDepartment(dep3);
+        // departments.add(dep3);
+        // companies.add(company2);
         
         mainPanel.setPreferredSize(new Dimension(400, 350));
         mainPanel.setBackground(Color.white);
@@ -175,6 +178,8 @@ public class MainApp extends JFrame {
     
     private void loadCompanies(ArrayList<Company> companies) {
         mainPanel.removeAll();
+        CompanyRepository companyRepository = new CompanyRepository(); 
+        companies = companyRepository.getAllCompanies();    
         for (Company company : companies) {
             JButton companyButton = new JButton(company.getName());
             companyButton.addActionListener(e -> {
@@ -190,10 +195,10 @@ public class MainApp extends JFrame {
         JButton addCompanyButton = new JButton("+");
         addCompanyButton.addActionListener(e -> {
             String newCompName = JOptionPane.showInputDialog("Введите название компании:");
-                if (newCompName != null && !newCompName.trim().isEmpty()) {
-                    companies.add(new Company(newCompName));
-                    loadCompanies(companies);
-                }
+            if (newCompName != null && !newCompName.trim().isEmpty()) {
+                companyRepository.addCompany(newCompName);
+                loadCompanies(companyRepository.getAllCompanies());
+            }
         });
         addCompanyButton.setBackground(Color.WHITE);
         addCompanyButton.setForeground(mainColor);
@@ -208,6 +213,8 @@ public class MainApp extends JFrame {
 
     private void loadDepartments(ArrayList<Department> departments) {
         mainPanel.removeAll();
+        DepartmentRepository departmentRepository = new DepartmentRepository();
+        departments = departmentRepository.getAllDepartments();
         for (Department department : departments) {
             JPanel card = new JPanel();
             card.setPreferredSize(new Dimension(100, 100));
@@ -226,9 +233,11 @@ public class MainApp extends JFrame {
     }
 
     private void loadDepartments(Company company) {
+        DepartmentRepository departmentRepository = new DepartmentRepository();
+        departments = departmentRepository.getDepartmentsByCompany(company);
         mainPanel.removeAll();
         if (company != null) {
-            for (Department department : company.getDepartments()) {
+            for (Department department : departments) {
                 JPanel card = new JPanel();
                 card.setPreferredSize(new Dimension(100, 100));
                 card.setBorder(BorderFactory.createLineBorder(Color.BLACK));
@@ -245,15 +254,12 @@ public class MainApp extends JFrame {
 
         JButton addDepartmentButton = new JButton("+");
         addDepartmentButton.addActionListener(e -> {
-            if (company != null) {
-                String newDeptName = JOptionPane.showInputDialog("Введите название отдела:");
-                if (newDeptName != null && !newDeptName.trim().isEmpty()) {
-                    company.addDepartment(new Department(newDeptName, company));
-                    departments.add(new Department(newDeptName, company));
-                    loadDepartments(company);
-                }
-            }
-        });
+        String newDeptName = JOptionPane.showInputDialog("Введите название отдела:");
+        if (newDeptName != null && !newDeptName.trim().isEmpty()) {
+            departmentRepository.addDepartment(newDeptName, company.getId());
+            loadDepartments(company);
+        }
+    });
         mainPanel.add(addDepartmentButton);
         
         mainPanel.revalidate();
@@ -264,6 +270,8 @@ public class MainApp extends JFrame {
 
     private void loadEmployees (ArrayList<Employee> employees) {
         mainPanel.removeAll();
+        EmployeesRepository employeesRepository = new EmployeesRepository();
+        employees = employeesRepository.getAllEmployees();
         for (Employee employee : employees) {
             JPanel card = new JPanel();
             card.setPreferredSize(new Dimension(100, 100));
@@ -294,8 +302,10 @@ public class MainApp extends JFrame {
 
     private void loadEmployees(Department department) {
         mainPanel.removeAll();
+        EmployeesRepository employeesRepository = new EmployeesRepository();
+        ArrayList<Employee> employees = employeesRepository.getEmployeesByDepartment(department.getId());
         if(department != null) {
-            for (Employee employee : department.getEmployees()) {
+            for (Employee employee : employees) {
                 JPanel card = new JPanel();
                 card.setPreferredSize(new Dimension(100, 100));
                 card.setBorder(BorderFactory.createLineBorder(Color.BLACK));
@@ -314,6 +324,7 @@ public class MainApp extends JFrame {
         
     private void addEmpDepartment(Department department) {
         if (department != null) {
+            EmployeesRepository employeesRepository = new EmployeesRepository();
             String newEmpName = JOptionPane.showInputDialog("Введите имя сотрудника:");
             String newEmpPosition = JOptionPane.showInputDialog("Введите его должность:");
             String newEmpSalary = JOptionPane.showInputDialog("Введите его зарплату:");
@@ -322,8 +333,7 @@ public class MainApp extends JFrame {
             
                 if (newEmpName != null && !newEmpName.trim().isEmpty() ||
                     newEmpPosition != null && newEmpPosition.trim().isEmpty()) {
-                    department.addEmployee(new Employee(newEmpName, newEmpPosition, salary));
-                    employees.add(new Employee(newEmpName, newEmpPosition, salary));
+                    employeesRepository.addEmployee(newEmpName, newEmpPosition, salary, department.getId());
                     loadEmployees(department);
                 }
             } catch (NumberFormatException e) {
