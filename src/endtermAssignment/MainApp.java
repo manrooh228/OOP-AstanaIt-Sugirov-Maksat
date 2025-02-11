@@ -23,6 +23,8 @@ public class MainApp extends JFrame {
     private Department selectedDepartment = null;
     private final Dimension buttonSize = new Dimension(Integer.MAX_VALUE, 35);
     private final Color mainColor = new Color(29, 88, 122);
+    // private final Font standardFont = new Font("Arial", Font.PLAIN, 16);
+    private final Font TitleFont = new Font("Arial", Font.BOLD, 20);
     private JPanel mainPanel = new JPanel();
     private ArrayList<Company> companies = new ArrayList<>();
     private ArrayList<Department> departments = new ArrayList<>();
@@ -109,12 +111,20 @@ public class MainApp extends JFrame {
         }
         
 
+        JPanel titlePanel = new JPanel();
+        // titlePanel.setBackground(Color.BLACK);
+        JLabel titleLabel2 = new JLabel("Companies list: ");
+        titleLabel2.setFont(TitleFont);
+        titleLabel2.setForeground(mainColor);
+        // titleLabel.setFont(new );
+        titlePanel.add(titleLabel2);     
+        add(titlePanel, BorderLayout.NORTH);
 
-
-
-
-
-
+        JPanel bottomPanel = new JPanel();
+        JLabel bottomLabel = new JLabel("Wellcome to Maksat's project");
+        bottomLabel.setForeground(mainColor);
+        bottomPanel.add(bottomLabel);
+        add(bottomPanel, BorderLayout.SOUTH);
 
         // --------------Обработка нажатия кнопок---------------//
 
@@ -123,7 +133,9 @@ public class MainApp extends JFrame {
             if (!currentMenu.equals("C")) {
                 currentMenu = "C";
                 selectedCompany = null;
+                titleLabel2.setText("Companies list");
                 loadCompanies(companies);
+                bottomLabel.setText("Wellcome to Maksat's project");
             }
         });
 
@@ -131,10 +143,14 @@ public class MainApp extends JFrame {
             if (!currentMenu.equals("D")) {
                 if (selectedCompany == null) {
                     currentMenu = "D";
+                    titleLabel2.setText("Departments list");
                     loadDepartments(departments);
+                    bottomLabel.setText("Чтобы добавить Department, первым делом выберите Company");
                 } else {
                     currentMenu = "D";
+                    titleLabel2.setText("Departments list");
                     loadDepartments(selectedCompany);
+                    bottomLabel.setText("Wellcome to Maksat's project");
                 }
             }
         });
@@ -145,9 +161,13 @@ public class MainApp extends JFrame {
                 if (!currentMenu.equals("E")) {
                     if (selectedDepartment == null) {
                         currentMenu = "E";
+                        titleLabel2.setText("Employees list");
                         loadEmployees(employees);
+                        bottomLabel.setText("Чтобы добавить Employee, первым делом выберите Department");
                     } else {
                         currentMenu = "E";
+                        titleLabel2.setText("Employees list");
+                        bottomLabel.setText("Чтобы просмотреть информацию о Employee, нажмите на него");
                         loadEmployees(selectedDepartment);
                     }
                 }
@@ -157,6 +177,7 @@ public class MainApp extends JFrame {
         // Панель компаний
         // mainPanel = new JPanel();
         // mainPanel.setLayout(new FlowLayout());
+        
         add(mainPanel, BorderLayout.EAST);
         add(sidePanel, BorderLayout.CENTER);
         setPreferredSize(new Dimension(600, 350));
@@ -226,6 +247,9 @@ public class MainApp extends JFrame {
                     loadEmployees(department);
                 }
             });
+            card.setBackground(Color.WHITE);
+            card.setForeground(mainColor);
+            card.setPreferredSize(new Dimension(100, 80));
             mainPanel.add(card);
         }
         mainPanel.revalidate();
@@ -248,6 +272,9 @@ public class MainApp extends JFrame {
                         loadEmployees(department);
                     }
                 });
+                card.setBackground(Color.WHITE);
+                card.setForeground(mainColor);
+                card.setPreferredSize(new Dimension(100, 80));
                 mainPanel.add(card);
             }
         } 
@@ -267,7 +294,7 @@ public class MainApp extends JFrame {
     }
     
     //-------------Employees functions--------------//
-
+       
     private void loadEmployees (ArrayList<Employee> employees) {
         mainPanel.removeAll();
         EmployeesRepository employeesRepository = new EmployeesRepository();
@@ -278,6 +305,9 @@ public class MainApp extends JFrame {
             card.setBorder(BorderFactory.createLineBorder(Color.BLACK));
             card.add(new JLabel(employee.getFullName()));
             showEmpInfo(card, employee);
+            card.setBackground(Color.WHITE);
+            card.setForeground(mainColor);
+            card.setPreferredSize(new Dimension(100, 80));
         mainPanel.add(card);
         mainPanel.revalidate();
         mainPanel.repaint();
@@ -310,6 +340,7 @@ public class MainApp extends JFrame {
                 card.setPreferredSize(new Dimension(100, 100));
                 card.setBorder(BorderFactory.createLineBorder(Color.BLACK));
                 card.add(new JLabel(employee.getFullName()));
+                
                 showEmpInfo(card, employee);
                 mainPanel.add(card);
             }
