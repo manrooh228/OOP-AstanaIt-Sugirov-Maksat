@@ -62,4 +62,28 @@ public class DepartmentRepository {
             e.printStackTrace();
         }
     }
+
+    public void updateDepartment(int departmentId, String newName) {
+        String query = "UPDATE department SET name = ? WHERE id = ?";
+        try (Connection conn = DBController.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, newName);
+            stmt.setInt(2, departmentId);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public void deleteDepartment(int departmentId) {
+        String query = "DELETE FROM department WHERE id = ?";
+        try (Connection conn = DBController.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, departmentId);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
 }

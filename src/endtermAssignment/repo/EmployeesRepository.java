@@ -24,7 +24,7 @@ public class EmployeesRepository {
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                employees.add(new Employee(rs.getString("full_name"),
+                employees.add(new Employee(rs.getInt("id"),rs.getString("full_name"),
                 rs.getString("position"), rs.getDouble("salary"), Department.getById(rs.getInt("department_id"))));
             }
         } catch (SQLException e) {
@@ -42,7 +42,7 @@ public class EmployeesRepository {
              ResultSet rs = stmt.executeQuery(query)) {
 
             while (rs.next()) {
-                employee.add(new Employee(rs.getString("full_name"), rs.getString("position"), rs.getInt("salary"), Department.getById(rs.getInt("department_id"))));
+                employee.add(new Employee(rs.getInt("id"),rs.getString("full_name"), rs.getString("position"), rs.getInt("salary"), Department.getById(rs.getInt("department_id"))));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -60,6 +60,31 @@ public class EmployeesRepository {
             stmt.setString(2, position);
             stmt.setInt(3, salary);
             stmt.setInt(4, departmentId);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updateEmployee(int id, String fullName, String position, int salary) {
+        String query = "UPDATE employee SET full_name = ?, position = ?, salary = ? WHERE id = ?";
+        try (Connection conn = DBController.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, fullName);
+            stmt.setString(2, position);
+            stmt.setInt(3, salary);
+            stmt.setInt(4, id);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteEmployee(int id) {
+        String query = "DELETE FROM employee WHERE id = ?";
+        try (Connection conn = DBController.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, id);
             stmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();

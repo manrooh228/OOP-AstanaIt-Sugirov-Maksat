@@ -5,6 +5,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import javax.swing.*;
@@ -149,7 +151,12 @@ public class MainApp extends JFrame {
                 } else {
                     currentMenu = "D";
                     titleLabel2.setText("Departments list");
-                    loadDepartments(selectedCompany);
+                    try {
+                        loadDepartments(selectedCompany);
+                    } catch (SQLException e1) {
+                        // TODO Auto-generated catch block
+                        e1.printStackTrace();
+                    }
                     bottomLabel.setText("Wellcome to Maksat's project");
                 }
             }
@@ -173,15 +180,15 @@ public class MainApp extends JFrame {
                 }
             }
         });
-
+        
         // Панель компаний
         // mainPanel = new JPanel();
         // mainPanel.setLayout(new FlowLayout());
         
         add(mainPanel, BorderLayout.EAST);
         add(sidePanel, BorderLayout.CENTER);
-        setPreferredSize(new Dimension(600, 350));
-        setMinimumSize(new Dimension(400, 225));
+        setPreferredSize(new Dimension(600, 400));
+        setMinimumSize(new Dimension(400, 400));
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         pack();
         setLocationRelativeTo(null);
@@ -202,16 +209,65 @@ public class MainApp extends JFrame {
         CompanyRepository companyRepository = new CompanyRepository(); 
         companies = companyRepository.getAllCompanies();    
         for (Company company : companies) {
-            JButton companyButton = new JButton(company.getName());
-            companyButton.addActionListener(e -> {
-                selectedCompany = company;
-                currentMenu = "D";
-                loadDepartments(selectedCompany);
+
+            JPanel card = new JPanel();
+            card.setPreferredSize(new Dimension(100, 100));
+            card.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+            card.add(new JLabel(company.getName()));
+
+            card.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    selectedCompany = company;
+                    currentMenu = "D";
+                    try {
+                        loadDepartments(selectedCompany);
+                    } catch (SQLException e1) {
+                        // TODO Auto-generated catch block
+                        e1.printStackTrace();
+                    }
+                }
             });
-            companyButton.setBackground(Color.WHITE);
-            companyButton.setForeground(mainColor);
-            companyButton.setPreferredSize(new Dimension(100, 80));
-            mainPanel.add(companyButton);
+            card.setBackground(Color.WHITE);
+            card.setForeground(mainColor);
+            card.setPreferredSize(new Dimension(100, 80));
+        
+            // card.setLayout(new FlowLayout(FlowLayout.LEFT, 20, 20));
+
+            JPanel total = new JPanel();
+            total.setLayout(new BoxLayout(total, BoxLayout.Y_AXIS));
+
+            JPanel buttonPanel = new JPanel();
+            JButton deleteBtn = new JButton("Delete");     
+            deleteBtn.setForeground(Color.RED);
+            JButton updateBtn = new JButton("Update");
+            updateBtn.setForeground(Color.GREEN);
+
+            updateBtn.addActionListener(e -> {
+                String newName = JOptionPane.showInputDialog("Введите новое название компании:", company.getName());
+                if (newName != null) {
+                    companyRepository.updateCompany(company.getId(), newName);
+                    ArrayList<Company> companies2 = companyRepository.getAllCompanies();
+                    loadCompanies(companies2);  
+                }
+            });
+            deleteBtn.addActionListener(e -> {
+                int confirm = JOptionPane.showConfirmDialog(null, 
+                    "Вы уверены, что хотите удалить этот компанию?", 
+                    "Подтверждение удаления", JOptionPane.YES_NO_OPTION);
+                if (confirm == JOptionPane.YES_OPTION) {
+                    companyRepository.deleteCompany(company.getId());
+                    ArrayList<Company> companies2 = companyRepository.getAllCompanies();
+                    loadCompanies(companies2);  
+                }
+            });
+
+            buttonPanel.add(updateBtn);
+            buttonPanel.add(deleteBtn);
+
+            total.add(card);
+            total.add(buttonPanel);
+            mainPanel.add(total);
         }
         JButton addCompanyButton = new JButton("+");
         addCompanyButton.addActionListener(e -> {
@@ -221,9 +277,10 @@ public class MainApp extends JFrame {
                 loadCompanies(companyRepository.getAllCompanies());
             }
         });
+        addCompanyButton.setFont(TitleFont);
         addCompanyButton.setBackground(Color.WHITE);
         addCompanyButton.setForeground(mainColor);
-        addCompanyButton.setPreferredSize(new Dimension(100, 80));
+        addCompanyButton.setPreferredSize(new Dimension(150, 110));
         mainPanel.add(addCompanyButton);
         mainPanel.revalidate();
         mainPanel.repaint();
@@ -250,13 +307,51 @@ public class MainApp extends JFrame {
             card.setBackground(Color.WHITE);
             card.setForeground(mainColor);
             card.setPreferredSize(new Dimension(100, 80));
-            mainPanel.add(card);
+        
+            // card.setLayout(new FlowLayout(FlowLayout.LEFT, 20, 20));
+
+            JPanel total = new JPanel();
+            total.setLayout(new BoxLayout(total, BoxLayout.Y_AXIS));
+
+            JPanel buttonPanel = new JPanel();
+            JButton deleteBtn = new JButton("Delete");
+            deleteBtn.setForeground(Color.RED);
+            JButton updateBtn = new JButton("Update");
+            updateBtn.setForeground(Color.GREEN);
+
+            updateBtn.addActionListener(e -> {
+                String newName = JOptionPane.showInputDialog("Введите новое название отдела:", department.getName());
+                if (newName != null && !newName.trim().isEmpty()) {
+                    departmentRepository.updateDepartment(department.getId(), newName);
+                    ArrayList<Department> departments2 = departmentRepository.getAllDepartments();
+                    loadDepartments(departments2);
+                }
+            });
+
+            deleteBtn.addActionListener(e -> {
+                int confirm = JOptionPane.showConfirmDialog(null, 
+                    "Вы уверены, что хотите удалить этот отдел?", 
+                    "Подтверждение удаления", JOptionPane.YES_NO_OPTION);
+                if (confirm == JOptionPane.YES_OPTION) {
+                    departmentRepository.deleteDepartment(department.getId());
+                    ArrayList<Department> departments2 = departmentRepository.getAllDepartments();
+                    loadDepartments(departments2);   
+                }
+            });
+
+
+            buttonPanel.add(updateBtn);
+            buttonPanel.add(deleteBtn);
+
+            total.add(card);
+            total.add(buttonPanel);
+            mainPanel.add(total);
         }
         mainPanel.revalidate();
         mainPanel.repaint();
     }
 
-    private void loadDepartments(Company company) {
+    private void loadDepartments(Company company) throws SQLException {
         DepartmentRepository departmentRepository = new DepartmentRepository();
         departments = departmentRepository.getDepartmentsByCompany(company);
         mainPanel.removeAll();
@@ -266,6 +361,8 @@ public class MainApp extends JFrame {
                 card.setPreferredSize(new Dimension(100, 100));
                 card.setBorder(BorderFactory.createLineBorder(Color.BLACK));
                 card.add(new JLabel(department.getName()));
+                // card.add(new JLabel("Most payed employee: "));
+                // card.add(new JLabel(department.getMostPayedEmp(department).getFullName()));
                 card.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
@@ -275,7 +372,42 @@ public class MainApp extends JFrame {
                 card.setBackground(Color.WHITE);
                 card.setForeground(mainColor);
                 card.setPreferredSize(new Dimension(100, 80));
-                mainPanel.add(card);
+
+                // card.setLayout(new FlowLayout(FlowLayout.LEFT, 20, 20));
+
+                JPanel total = new JPanel();
+                total.setLayout(new BoxLayout(total, BoxLayout.Y_AXIS));
+
+                JPanel buttonPanel = new JPanel();
+                JButton deleteBtn = new JButton("Delete");
+                deleteBtn.setForeground(Color.RED);
+                JButton updateBtn = new JButton("Update");
+                updateBtn.setForeground(Color.GREEN);
+                updateBtn.addActionListener(e -> {
+                    String newName = JOptionPane.showInputDialog("Введите новое название отдела:", department.getName());
+                    if (newName != null && !newName.trim().isEmpty()) {
+                        departmentRepository.updateDepartment(department.getId(), newName);
+                        ArrayList<Department> departments2 = departmentRepository.getAllDepartments();
+                        loadDepartments(departments2);   
+                    }
+                });
+
+                deleteBtn.addActionListener(e -> {
+                    int confirm = JOptionPane.showConfirmDialog(null, 
+                        "Вы уверены, что хотите удалить этот отдел?", 
+                        "Подтверждение удаления", JOptionPane.YES_NO_OPTION);
+                    if (confirm == JOptionPane.YES_OPTION) {
+                        departmentRepository.deleteDepartment(department.getId());
+                        ArrayList<Department> departments2 = departmentRepository.getAllDepartments();
+                        loadDepartments(departments2);
+                    }
+                });
+                buttonPanel.add(updateBtn);
+                buttonPanel.add(deleteBtn);
+
+                total.add(card);
+                total.add(buttonPanel);
+                mainPanel.add(total);
             }
         } 
 
@@ -284,9 +416,18 @@ public class MainApp extends JFrame {
         String newDeptName = JOptionPane.showInputDialog("Введите название отдела:");
         if (newDeptName != null && !newDeptName.trim().isEmpty()) {
             departmentRepository.addDepartment(newDeptName, company.getId());
-            loadDepartments(company);
+            try {
+                loadDepartments(company);
+            } catch (SQLException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
         }
-    });
+        });
+        addDepartmentButton.setFont(TitleFont);
+        addDepartmentButton.setBackground(Color.WHITE);
+        addDepartmentButton.setForeground(mainColor);
+        addDepartmentButton.setPreferredSize(new Dimension(150, 110));
         mainPanel.add(addDepartmentButton);
         
         mainPanel.revalidate();
@@ -308,7 +449,52 @@ public class MainApp extends JFrame {
             card.setBackground(Color.WHITE);
             card.setForeground(mainColor);
             card.setPreferredSize(new Dimension(100, 80));
-        mainPanel.add(card);
+        
+            // card.setLayout(new FlowLayout(FlowLayout.LEFT, 20, 20));
+
+            JPanel total = new JPanel();
+            total.setLayout(new BoxLayout(total, BoxLayout.Y_AXIS));
+
+            JPanel buttonPanel = new JPanel();
+            JButton deleteBtn = new JButton("Delete");
+            deleteBtn.setForeground(Color.RED);
+            JButton updateBtn = new JButton("Update");
+            updateBtn.setForeground(Color.GREEN);
+
+            updateBtn.addActionListener(e -> {
+                String newEmpName = JOptionPane.showInputDialog("Введите имя сотрудника:");
+                String newEmpPosition = JOptionPane.showInputDialog("Введите его должность:");
+                String newEmpSalary = JOptionPane.showInputDialog("Введите его зарплату:");
+                try {
+                    Integer salary = Integer.parseInt(newEmpSalary);
+                
+                    if (newEmpName != null && !newEmpName.trim().isEmpty() ||
+                        newEmpPosition != null && newEmpPosition.trim().isEmpty()) {
+                        employeesRepository.updateEmployee(employee.getId(), newEmpName, newEmpPosition, salary);
+                        ArrayList<Employee> employees1 = employeesRepository.getAllEmployees();
+                        loadEmployees(employees1);
+                    }
+                } catch (NumberFormatException e1) {
+                    JOptionPane.showMessageDialog(null, "Введите корректную зарплату!", "Ошибка", JOptionPane.ERROR_MESSAGE);
+                }
+            });
+            deleteBtn.addActionListener(e -> {
+                int confirm = JOptionPane.showConfirmDialog(null, 
+                        "Вы уверены, что хотите удалить этого сотрудника?", 
+                        "Подтверждение удаления", JOptionPane.YES_NO_OPTION);
+                    if (confirm == JOptionPane.YES_OPTION) {
+                        employeesRepository.deleteEmployee(employee.getId());
+                        ArrayList<Employee> employees1 = employeesRepository.getAllEmployees();
+                        loadEmployees(employees1);
+                    }
+            });
+
+            buttonPanel.add(updateBtn);
+            buttonPanel.add(deleteBtn);
+
+            total.add(card);
+            total.add(buttonPanel);
+            mainPanel.add(total);
         mainPanel.revalidate();
         mainPanel.repaint();
         }
@@ -342,12 +528,59 @@ public class MainApp extends JFrame {
                 card.add(new JLabel(employee.getFullName()));
                 
                 showEmpInfo(card, employee);
-                mainPanel.add(card);
+                
+                // card.setLayout(new FlowLayout(FlowLayout.LEFT, 20, 20));
+
+                JPanel total = new JPanel();
+                total.setLayout(new BoxLayout(total, BoxLayout.Y_AXIS));
+
+                JPanel buttonPanel = new JPanel();
+                JButton deleteBtn = new JButton("Delete");
+                deleteBtn.setForeground(Color.RED);
+                JButton updateBtn = new JButton("Update");
+                updateBtn.setForeground(Color.GREEN);
+                updateBtn.addActionListener(e -> {
+                    String newEmpName = JOptionPane.showInputDialog("Введите имя сотрудника:");
+                    String newEmpPosition = JOptionPane.showInputDialog("Введите его должность:");
+                    String newEmpSalary = JOptionPane.showInputDialog("Введите его зарплату:");
+                    try {
+                        Integer salary = Integer.parseInt(newEmpSalary);
+                    
+                        if (newEmpName != null && !newEmpName.trim().isEmpty() ||
+                            newEmpPosition != null && newEmpPosition.trim().isEmpty()) {
+                            employeesRepository.updateEmployee(employee.getId(), newEmpName, newEmpPosition, salary);
+                            ArrayList<Employee> employees1 = employeesRepository.getAllEmployees();
+                            loadEmployees(employees1);
+                        }
+                    } catch (NumberFormatException e1) {
+                        JOptionPane.showMessageDialog(null, "Введите корректную зарплату!", "Ошибка", JOptionPane.ERROR_MESSAGE);
+                    }
+                });
+                deleteBtn.addActionListener(e -> {
+                    int confirm = JOptionPane.showConfirmDialog(null, 
+                            "Вы уверены, что хотите удалить этого сотрудника?", 
+                            "Подтверждение удаления", JOptionPane.YES_NO_OPTION);
+                        if (confirm == JOptionPane.YES_OPTION) {
+                            employeesRepository.deleteEmployee(employee.getId());
+                            ArrayList<Employee> employees1 = employeesRepository.getAllEmployees();
+                            loadEmployees(employees1);
+                        }
+                });
+                buttonPanel.add(updateBtn);
+                buttonPanel.add(deleteBtn);
+
+                total.add(card);
+                total.add(buttonPanel);
+                mainPanel.add(total);
             }
         }
 
         JButton addDepartmentButton = new JButton("+");
         addDepartmentButton.addActionListener(e -> addEmpDepartment(department));
+        addDepartmentButton.setFont(TitleFont);
+        addDepartmentButton.setBackground(Color.WHITE);
+        addDepartmentButton.setForeground(mainColor);
+        addDepartmentButton.setPreferredSize(new Dimension(150, 110));
         mainPanel.add(addDepartmentButton);
         mainPanel.revalidate();
         mainPanel.repaint();

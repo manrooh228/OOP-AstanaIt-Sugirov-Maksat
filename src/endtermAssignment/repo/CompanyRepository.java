@@ -42,4 +42,28 @@ public class CompanyRepository {
             e.printStackTrace();
         }
     }
+
+    public void updateCompany(int id, String name) {
+        String query = "UPDATE company SET name = ? WHERE id = ?";
+        try (Connection conn = DBController.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, name);
+            stmt.setInt(2, id);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Метод для удаления компании
+    public void deleteCompany(int id) {
+        String query = "DELETE FROM company WHERE id = ?";
+        try (Connection conn = DBController.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, id);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }
